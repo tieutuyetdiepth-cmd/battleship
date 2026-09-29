@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#040914">
+<title>BattleShip V3 — Cinematic Online</title>
+<style>
+:root{
+  --bg:#040914;--bg2:#071426;--panel:rgba(8,20,37,.76);--panel2:rgba(10,27,48,.92);
+  --line:rgba(107,182,255,.19);--line2:rgba(107,182,255,.38);
+  --text:#f3f8ff;--muted:#95b2cf;--blue:#2ba7ff;--cyan:#6ee8ff;--green:#55d88c;
+  --yellow:#ffd45b;--red:#ff5e70;--orange:#ff964d;--water1:#0b3454;--water2:#082741;
+  --shadow:0 28px 70px rgba(0,0,0,.42);--radius:24px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:
+radial-gradient(circle at 50% -10%,rgba(42,151,255,.20),transparent 33%),
+radial-gradient(circle at 12% 32%,rgba(45,213,255,.08),transparent 24%),
+linear-gradient(180deg,#071426,#040914 64%,#02050a);
+color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{overflow-x:hidden}
+body:before{
+ content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;
+ background:
+ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+ background-size:48px 48px;
+ mask-image:linear-gradient(180deg,#000 0%,transparent 82%)
+}
+.app{max-width:1180px;margin:auto;padding:16px 14px 40px;position:relative}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:15px}
+.logo{font-weight:1000;font-size:clamp(30px,5vw,54px);line-height:.9;letter-spacing:-2px;text-shadow:0 0 28px rgba(43,167,255,.28)}
+.logo small{display:block;margin-top:10px;font-size:11px;letter-spacing:4px;color:var(--cyan);text-transform:uppercase}
+.topbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.pill{padding:10px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(7,22,40,.72);backdrop-filter:blur(15px);font-size:12px;font-weight:850;color:var(--muted)}
+button,input{font:inherit}
+button{cursor:pointer}
+.btn{border:0;border-radius:16px;padding:13px 16px;font-weight:950;color:#fff;transition:.18s transform,.18s opacity,.2s box-shadow,.2s filter}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.04)}
+.btn:active{transform:none}
+.btn:disabled{opacity:.42;cursor:not-allowed;transform:none;filter:none}
+.primary{background:linear-gradient(135deg,#39b7ff,#1169e8);box-shadow:0 12px 26px rgba(17,105,232,.28)}
+.secondary{background:linear-gradient(135deg,#16314a,#1a4267);border:1px solid rgba(132,196,255,.14)}
+.ghost{background:rgba(14,37,60,.84);border:1px solid var(--line)}
+.danger{background:linear-gradient(135deg,#5a2430,#8a3344)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(18px);overflow:hidden;position:relative}
+.card:before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.30),transparent)}
+.pad{padding:18px}
+.hidden{display:none!important}
+.grid2{display:grid;grid-template-columns:1fr;gap:15px}
+@media(min-width:900px){.grid2{grid-template-columns:1.05fr .95fr}}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stack{display:grid;gap:12px}
+input{width:100%;min-width:0;background:rgba(4,15,27,.82);border:1px solid rgba(116,178,233,.22);color:#fff;border-radius:16px;padding:14px 15px;outline:none}
+input:focus{border-color:#42b8ff;box-shadow:0 0 0 3px rgba(66,184,255,.11)}
+.label{font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:#79c8f3;font-weight:900}
+.h1{font-size:24px;font-weight:1000;line-height:1.1;margin:2px 0 0}
+.muted{font-size:13px;line-height:1.55;color:var(--muted)}
+.notice{padding:12px 13px;border:1px solid var(--line);border-radius:16px;background:rgba(6,19,34,.74);display:flex;gap:10px;align-items:flex-start}
+.statusdot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px rgba(110,232,255,.9);margin-top:6px;flex:0 0 auto}
+.roomcode{font-size:21px;font-weight:1000;letter-spacing:2px}
+.playerchips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:9px 12px;border-radius:14px;background:rgba(6,19,34,.74);border:1px solid var(--line);font-size:13px;font-weight:800}
+.chip.me{border-color:rgba(85,216,140,.25)}
+.chip.enemy{border-color:rgba(255,94,112,.22)}
+.arena{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:960px){.arena{grid-template-columns:1fr 1fr}}
+.boardcard{overflow:visible}
+.boardtop{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.boardtitle{font-size:18px;font-weight:1000}
+.badge{padding:7px 10px;border-radius:999px;background:rgba(10,35,58,.77);border:1px solid var(--line);font-size:11px;font-weight:900;color:var(--muted)}
+.boardwrap{overflow:auto}
+.board{
+ display:grid;
+ grid-template-columns:26px repeat(10,minmax(26px,1fr));
+ grid-template-rows:26px repeat(10,minmax(26px,1fr));
+ width:min(100%,540px);aspect-ratio:1;margin:auto;gap:2px;
+}
+.axis{display:flex;align-items:center;justify-content:center;color:#7eb7df;font-weight:850;font-size:11px}
+.cell{position:relative;border:1px solid rgba(115,180,235,.16);border-radius:8px;background:
+radial-gradient(circle at 25% 20%,rgba(255,255,255,.055),transparent 23%),
+linear-gradient(145deg,var(--water1),var(--water2));
+overflow:hidden;transition:.12s transform,.18s box-shadow,.18s filter;cursor:pointer}
+.cell:hover{transform:translateY(-1px)}
+.cell:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.025),transparent)}
+.cell.ship{background:
+linear-gradient(145deg,rgba(89,220,148,.93),rgba(35,116,76,.97));
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.cell.targetable{outline:2px solid rgba(80,187,255,.5);outline-offset:-2px}
+.cell.preview-ok{outline:2px solid rgba(85,216,140,.7);outline-offset:-2px}
+.cell.preview-bad{outline:2px solid rgba(255,94,112,.72);outline-offset:-2px}
+.cell.miss:after,.cell.hit:after{content:"";position:absolute;inset:24%;border-radius:50%}
+.cell.miss:after{background:#91a8c1;box-shadow:0 0 0 5px rgba(145,168,193,.11)}
+.cell.hit{background:linear-gradient(145deg,#6b1e2d,#3d0e16)}
+.cell.hit:after{background:radial-gradient(circle,#ffd08a 0 18%,#ff714f 25% 54%,#ff364f 57% 100%);box-shadow:0 0 0 5px rgba(255,94,112,.13),0 0 24px rgba(255,94,112,.55)}
+.cell.sunk{background:linear-gradient(145deg,#8a1528,#3a0a13)!important}
+.shiplist{display:grid;grid-template-columns:1fr;gap:9px}
+@media(min-width:620px){.shiplist{grid-template-columns:repeat(2,1fr)}}
+.shipitem{padding:12px;border-radius:16px;border:1px solid var(--line);background:rgba(5,18,31,.76)}
+.shipitem.active{border-color:rgba(74,182,255,.42);box-shadow:0 0 0 1px rgba(74,182,255,.12) inset}
+.shipitem.done{opacity:.55}
+.shiphead{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.blocks{display:flex;gap:4px;margin-top:8px}
+.blocks i{display:block;height:11px;flex:1;border-radius:4px;background:linear-gradient(180deg,#62df98,#2f8f5c)}
+.scorebar{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:700px){.scorebar{grid-template-columns:repeat(4,1fr)}}
+.kpi{padding:12px 13px;border-radius:16px;background:rgba(5,18,31,.78);border:1px solid var(--line)}
+.kpi span{display:block;font-size:11px;color:var(--muted);font-weight:800}
+.kpi b{display:block;font-size:22px;margin-top:2px}
+.turnhero{padding:16px;border-radius:18px;background:
+radial-gradient(circle at 100% 0%,rgba(47,171,255,.12),transparent 36%),
+rgba(6,19,34,.78);border:1px solid var(--line)}
+.turnbig{font-size:clamp(24px,4vw,34px);font-weight:1000}
+.radar{position:relative;width:120px;height:120px;border-radius:50%;border:1px solid rgba(82,193,255,.25);background:
+radial-gradient(circle,transparent 0 24%,rgba(65,188,255,.12) 25% 26%,transparent 27% 49%,rgba(65,188,255,.12) 50% 51%,transparent 52%),
+linear-gradient(rgba(65,188,255,.12) 1px,transparent 1px),
+linear-gradient(90deg,rgba(65,188,255,.12) 1px,transparent 1px);
+background-size:auto,50% 100%,100% 50%;overflow:hidden;flex:0 0 auto}
+.radar:before{content:"";position:absolute;inset:50% 50% 0 50%;width:50%;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);transform-origin:left center;animation:sweep 2.7s linear infinite}
+.radar:after{content:"";position:absolute;left:32%;top:29%;width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:31px 25px 0 var(--yellow),45px 51px 0 var(--cyan),0 0 10px var(--green),31px 25px 12px var(--yellow),45px 51px 10px var(--cyan)}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.gamehead{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.fxlayer{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.missile{position:absolute;width:8px;height:30px;border-radius:999px;background:linear-gradient(#fff,#8fe8ff 45%,#207bd9);box-shadow:0 0 16px #7beaff;transform:rotate(45deg)}
+.explosion{position:absolute;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#fff 0 8%,#ffd85f 12% 28%,#ff7b45 32% 52%,#ff385d 56% 72%,transparent 75%);transform:translate(-50%,-50%) scale(.2);animation:boom .52s ease-out forwards}
+.splash{position:absolute;width:18px;height:18px;border-radius:50%;border:3px solid #d8f4ff;transform:translate(-50%,-50%) scale(.2);animation:splash .55s ease-out forwards}
+@keyframes boom{60%{transform:translate(-50%,-50%) scale(2.8);opacity:1}100%{transform:translate(-50%,-50%) scale(3.5);opacity:0}}
+@keyframes splash{60%{transform:translate(-50%,-50%) scale(2.2);opacity:1}100%{transform:translate(-50%,-50%) scale(3);opacity:0}}
+.shake{animation:shake .3s linear}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.modal{position:fixed;inset:0;background:rgba(1,5,10,.78);backdrop-filter:blur(12px);z-index:80;display:flex;align-items:center;justify-content:center;padding:18px}
+.modalbox{width:min(92vw,540px);padding:26px;border-radius:28px;background:
+radial-gradient(circle at 50% 0%,rgba(60,165,255,.18),transparent 38%),
+rgba(6,18,31,.96);border:1px solid var(--line2);box-shadow:0 36px 100px rgba(0,0,0,.6);text-align:center}
+.resulticon{font-size:72px;line-height:1}
+.resulttitle{font-size:38px;font-weight:1000;margin-top:6px}
+.toastwrap{position:fixed;right:14px;bottom:14px;z-index:90;display:grid;gap:9px;max-width:min(92vw,390px)}
+.toast{padding:12px 14px;border-radius:15px;background:rgba(5,18,31,.94);border:1px solid var(--line);box-shadow:var(--shadow);animation:toast .22s ease}
+@keyframes toast{from{opacity:0;transform:translateY(10px)}}
+.footer{text-align:center;color:#6484a3;font-size:12px;padding-top:18px}
+@media(max-width:560px){
+ .app{padding:12px 10px 28px}.pad{padding:14px}.btn{padding:12px 13px}.radar{width:92px;height:92px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="hero">
+    <div class="logo">BATTLESHIP V3<small>Cinematic online duel</small></div>
+    <div class="topbar">
+      <div class="pill" id="netBadge">Chưa kết nối</div>
+      <button class="btn ghost" id="soundBtn">🔊 Âm thanh</button>
+    </div>
+  </div>
+
+  <section class="card" id="lobby">
+    <div class="pad grid2">
+      <div class="stack">
+        <div>
+          <div class="label">Lobby</div>
+          <div class="h1">Tạo trận 1v1 và gửi link cho người kia</div>
+          <div class="muted">Người tạo phòng đi trước. Hai người tự đặt tàu rồi bắn luân phiên theo luật Battleship.</div>
+        </div>
+        <input id="playerName" maxlength="18" placeholder="Tên của bạn (ví dụ: Tiến)">
+        <div class="row">
+          <button class="btn primary" id="createBtn">⚓ Tạo phòng</button>
+          <input id="roomInput" maxlength="8" placeholder="Mã phòng">
+          <button class="btn secondary" id="joinBtn">Vào phòng</button>
+        </div>
+        <div id="roomBox" class="stack hidden">
+          <div class="notice"><span class="statusdot"></span><div><b>Mã phòng</b><div class="roomcode" id="roomCode">—</div></div></div>
+          <div class="row"><input id="shareLink" readonly><button class="btn secondary" id="copyBtn">Copy link</button></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="notice"><span class="statusdot"></span><div><b>Trạng thái</b><div class="muted" id="lobbyMsg">Tạo phòng mới hoặc nhập mã phòng.</div></div></div>
+        <div class="playerchips">
+          <div class="chip me">🟢 Bạn: <span id="meName">Người chơi 1</span></div>
+          <div class="chip enemy">🔴 Đối thủ: <span id="enemyName">Chưa vào</span></div>
+        </div>
+        <div class="notice"><span class="statusdot"></span><div><b>Tip</b><div class="muted">Sau khi host lên Netlify/Vercel/GitHub Pages, link mời hoạt động giữa 2 điện thoại qua Internet.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card hidden" id="setup">
+    <div class="pad">
+      <div class="gamehead">
+        <div>
+          <div class="label">Fleet setup</div>
+          <div class="h1">Đặt hạm đội</div>
+          <div class="muted" id="setupMsg">Đặt đủ 5 tàu rồi bấm Sẵn sàng.</div>
+        </div>
+        <div class="row">
+          <span class="badge" id="orientation">Ngang</span>
+          <span class="badge" id="readyLabel">Chưa sẵn sàng</span>
+        </div>
+      </div>
+      <div class="arena" style="margin-top:16px">
+        <div class="card boardcard"><div class="pad"><div class="boardwrap"><div class="board" id="setupBoard"></div></div></div></div>
+        <div class="stack">
+          <div class="shiplist" id="shipList"></div>
+          <div class="row">
+            <button class="btn secondary" id="rotateBtn">↻ Xoay tàu</button>
+            <button class="btn secondary" id="randomBtn">🎲 Ngẫu nhiên</button>
+            <button class="btn danger" id="clearBtn">Xóa</button>
+            <button class="btn primary" id="readyBtn" disabled>✅ Sẵn sàng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hidden" id="game">
+    <section class="card">
+      <div class="pad">
+        <div class="gamehead">
+          <div class="turnhero" style="flex:1;min-width:260px">
+            <div class="label">Battle status</div>
+            <div class="turnbig" id="turnText">Đang chờ…</div>
+            <div class="muted" id="gameMsg">Chuẩn bị chiến đấu.</div>
+          </div>
+          <div class="radar" aria-label="Radar animation"></div>
+        </div>
+        <div class="scorebar" style="margin-top:12px">
+          <div class="kpi"><span>Tàu bạn</span><b id="myRemain">5</b></div>
+          <div class="kpi"><span>Tàu đối thủ</span><b id="enemyRemain">5</b></div>
+          <div class="kpi"><span>Độ chính xác</span><b id="accuracy">0%</b></div>
+          <div class="kpi"><span>Lượt</span><b id="turnCount">0</b></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="arena" style="margin-top:16px">
+      <section class="card boardcard">
+        <div class="pad">
+          <div class="boardtop"><div class="boardtitle">🛡️ Hạm đội của bạn</div><span class="badge">Phòng thủ</span></div>
+          <div class="boardwrap"><div class="board" id="myBoard"></div></div>
+        </div>
+      </section>
+      <section class="card boardcard">
+        <div class="pad">
+          <div class="boardtop"><div class="boardtitle">🎯 Vùng biển đối thủ</div><span class="badge">Khai hỏa</span></div>
+          <div class="boardwrap"><div class="board" id="enemyBoard"></div></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <div class="footer">BattleShip V3 • WebRTC P2P • Mobile-first</div>
+</div>
+
+<div class="fxlayer" id="fx"></div>
+<div class="toastwrap" id="toasts"></div>
+
+<div class="modal hidden" id="resultModal">
+  <div class="modalbox">
+    <div class="resulticon" id="resultIcon">🏆</div>
+    <div class="resulttitle" id="resultTitle">Chiến thắng!</div>
+    <div class="muted" id="resultSub">Bạn đã đánh chìm toàn bộ hạm đội đối thủ.</div>
+    <div class="row" style="justify-content:center;margin-top:18px">
+      <button class="btn primary" id="rematchBtn">🔁 Chơi lại cùng phòng</button>
+      <button class="btn secondary" id="closeResultBtn">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script>
+(()=>{
+const SHIPS=[
+ {name:"Tàu sân bay",size:5},
+ {name:"Thiết giáp hạm",size:4},
+ {name:"Tuần dương hạm",size:3},
+ {name:"Tàu ngầm",size:3},
+ {name:"Khu trục hạm",size:2}
+];
+const $=s=>document.querySelector(s), letters="ABCDEFGHIJ";
+const state={
+ role:null,room:null,peer:null,conn:null,connected:false,
+ me:"Người chơi 1",enemy:"Đối thủ",
+ orientation:"h",placements:[],ready:false,enemyReady:false,
+ started:false,myTurn:false,myShots:{},enemyShots:{},over:false,sound:true,turnCount:0
+};
+function key(r,c){return r+"-"+c}
+function roomId(c){return "bship-v3-"+c.toUpperCase()}
+function code(){const ch="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<6;i++)s+=ch[Math.floor(Math.random()*ch.length)];return s}
+function show(el,on=true){el.classList.toggle("hidden",!on)}
+function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;$("#toasts").appendChild(t);setTimeout(()=>t.remove(),2800)}
+function setNet(t){$("#netBadge").textContent=t}
+function nameNow(){
+ const n=$("#playerName").value.trim().slice(0,18);
+ state.me=n||"Người chơi 1";
+ $("#meName").textContent=state.me;
+}
+function audio(type){
+ if(!state.sound)return;
+ try{
+  const ctx=audio.ctx||(audio.ctx=new (window.AudioContext||window.webkitAudioContext)());
+  const o=ctx.createOscillator(),g=ctx.createGain(),now=ctx.currentTime;o.connect(g);g.connect(ctx.destination);
+  if(type==="launch"){o.type="sawtooth";o.frequency.setValueAtTime(180,now);o.frequency.exponentialRampToValueAtTime(700,now+.28)}
+  if(type==="hit"){o.type="square";o.frequency.setValueAtTime(150,now);o.frequency.exponentialRampToValueAtTime(80,now+.16)}
+  if(type==="miss"){o.type="sine";o.frequency.setValueAtTime(420,now);o.frequency.exponentialRampToValueAtTime(220,now+.16)}
+  if(type==="win"){o.type="triangle";o.frequency.setValueAtTime(523,now);o.frequency.linearRampToValueAtTime(784,now+.28)}
+  if(type==="lose"){o.type="sawtooth";o.frequency.setValueAtTime(260,now);o.frequency.linearRampToValueAtTime(110,now+.3)}
+  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.06,now+.01);g.gain.exponentialRampToValueAtTime(.0001,now+.34);
+  o.start(now);o.stop(now+.35);
+ }catch(e){}
+}
+function boardBuild(id,mode){
+ const b=$(id);b.innerHTML="";
+ for(let r=-1;r<10;r++)for(let c=-1;c<10;c++){
+  const el=document.createElement(r<0||c<0?"div":"button");
+  if(r<0||c<0){
+   el.className="axis"; el.textContent=r<0&&c>=0?letters[c]:c<0&&r>=0?String(r+1):"";
+  }else{
+   el.type="button";el.className="cell";el.dataset.r=r;el.dataset.c=c;el.setAttribute("aria-label",letters[c]+(r+1));
+   if(mode==="setup"){
+    el.addEventListener("mouseenter",()=>preview(r,c));
+    el.addEventListener("click",()=>place(r,c));
+   }
+   if(mode==="enemy")el.addEventListener("click",()=>fire(r,c));
+  }
+  b.appendChild(el);
+ }
+}
+function cell(id,r,c){return $(id).children[(r+1)*11+(c+1)]}
+function candidate(r,c,size,o){
+ const a=[];for(let i=0;i<size;i++){const rr=r+(o==="v"?i:0),cc=c+(o==="h"?i:0);if(rr>9||cc>9)return null;a.push([rr,cc])}return a
+}
+function canPlace(r,c,size,o){
+ const a=candidate(r,c,size,o);if(!a)return null;
+ const occ=new Set(state.placements.flatMap(p=>p.cells.map(x=>key(...x))));
+ return a.some(x=>occ.has(key(...x)))?null:a;
+}
+function clearPreview(){document.querySelectorAll("#setupBoard .preview-ok,#setupBoard .preview-bad").forEach(x=>x.classList.remove("preview-ok","preview-bad"))}
+function preview(r,c){
+ if(state.ready||state.placements.length>=SHIPS.length)return;
+ clearPreview();const s=SHIPS[state.placements.length],all=candidate(r,c,s.size,state.orientation),ok=canPlace(r,c,s.size,state.orientation);
+ if(all)all.forEach(([rr,cc])=>{const e=cell("#setupBoard",rr,cc);if(!e.classList.contains("ship"))e.classList.add(ok?"preview-ok":"preview-bad")})
+}
+function renderSetup(){
+ document.querySelectorAll("#setupBoard .cell").forEach(x=>x.className="cell");
+ state.placements.forEach(p=>p.cells.forEach(([r,c])=>cell("#setupBoard",r,c).classList.add("ship")));
+ $("#orientation").textContent=state.orientation==="h"?"Ngang":"Dọc";
+ $("#readyLabel").textContent=state.ready?"Đã sẵn sàng":"Chưa sẵn sàng";
+ $("#shipList").innerHTML="";
+ SHIPS.forEach((s,i)=>{
+  const d=document.createElement("div");
+  d.className="shipitem"+(i===state.placements.length&&!state.ready?" active":"")+(i<state.placements.length?" done":"");
+  d.innerHTML='<div class="shiphead"><b>'+s.name+'</b><span>'+s.size+' ô</span></div><div class="blocks">'+Array(s.size).fill("<i></i>").join("")+"</div>";
+  $("#shipList").appendChild(d);
+ });
+ $("#readyBtn").disabled=state.placements.length!==SHIPS.length||state.ready;
+ $("#setupMsg").textContent=state.ready?"Bạn đã sẵn sàng. Chờ đối thủ…":state.placements.length===SHIPS.length?"Đã đặt đủ tàu. Bấm Sẵn sàng.":"Đang đặt: "+SHIPS[state.placements.length].name;
+}
+function place(r,c){
+ if(state.ready||state.placements.length>=SHIPS.length)return;
+ const s=SHIPS[state.placements.length],a=canPlace(r,c,s.size,state.orientation);if(!a){toast("Vị trí không hợp lệ.");return}
+ state.placements.push({name:s.name,size:s.size,cells:a,hits:[]});renderSetup();toast("Đã đặt "+s.name)
+}
+function randomize(){
+ if(state.ready)return;state.placements=[];
+ for(let i=0;i<SHIPS.length;i++){
+  let ok=false;
+  for(let k=0;k<600&&!ok;k++){const o=Math.random()<.5?"h":"v",r=Math.floor(Math.random()*10),c=Math.floor(Math.random()*10),a=canPlace(r,c,SHIPS[i].size,o);if(a){state.placements.push({name:SHIPS[i].name,size:SHIPS[i].size,cells:a,hits:[]});ok=true}}
+ }
+ renderSetup();toast("Đã đặt ngẫu nhiên hạm đội.")
+}
+function roomUI(){
+ $("#roomCode").textContent=state.room;show($("#roomBox"),true);
+ const u=new URL(location.href);u.searchParams.set("room",state.room);u.searchParams.set("join","1");$("#shareLink").value=u.toString()
+}
+function cleanup(){try{state.conn&&state.conn.close()}catch(e){}try{state.peer&&state.peer.destroy()}catch(e){}state.conn=null;state.peer=null;state.connected=false}
+function attach(conn){
+ state.conn=conn;
+ conn.on("open",()=>{
+  state.connected=true;setNet("Đã kết nối");show($("#setup"),true);$("#lobbyMsg").textContent="Đã kết nối. Hãy đặt hạm đội.";
+  toast("Đối thủ đã kết nối.");
+  conn.send({type:"intro",name:state.me});
+ });
+ conn.on("data",onData);
+ conn.on("close",()=>{setNet("Mất kết nối");$("#gameMsg").textContent="Đối thủ đã ngắt kết nối.";toast("Đối thủ đã rời trận.")});
+ conn.on("error",()=>toast("Lỗi kết nối."))
+}
+function host(){
+ nameNow();cleanup();state.role="host";state.room=code();state.peer=new Peer(roomId(state.room));
+ state.peer.on("open",()=>{setNet("Đang chờ");roomUI();$("#lobbyMsg").textContent="Phòng đã tạo. Gửi link cho người thứ hai.";toast("Đã tạo phòng "+state.room)});
+ state.peer.on("connection",c=>{if(state.conn&&state.conn.open){c.close();return}attach(c)});
+ state.peer.on("error",e=>{$("#lobbyMsg").textContent="Không thể tạo phòng: "+e.type;setNet("Lỗi")})
+}
+function join(){
+ nameNow();const c=$("#roomInput").value.trim().toUpperCase();if(c.length<4){toast("Nhập mã phòng hợp lệ.");return}
+ cleanup();state.role="guest";state.room=c;roomUI();state.peer=new Peer();
+ state.peer.on("open",()=>{setNet("Đang kết nối");attach(state.peer.connect(roomId(state.room),{reliable:true,metadata:{game:"bship-v3"}}))});
+ state.peer.on("error",e=>{$("#lobbyMsg").textContent="Lỗi kết nối: "+e.type;setNet("Lỗi")})
+}
+function ready(){
+ if(state.placements.length!==SHIPS.length)return;state.ready=true;renderSetup();state.conn?.send({type:"ready"});maybeStart()
+}
+function maybeStart(){
+ if(!(state.ready&&state.enemyReady)||state.started)return;
+ state.started=true;state.myTurn=state.role==="host";show($("#setup"),false);show($("#game"),true);renderBoards();status();toast("Trận đấu bắt đầu!")
+}
+function renderBoards(){
+ boardBuild("#myBoard","my");boardBuild("#enemyBoard","enemy");
+ state.placements.forEach(p=>p.cells.forEach(([r,c])=>cell("#myBoard",r,c).classList.add("ship")));renderShots();stats()
+}
+function stats(){
+ const mySunk=state.placements.filter(p=>p.hits.length===p.size).length;
+ const enemySunk=new Set(Object.values(state.myShots).filter(x=>x.sunk&&x.shipName).map(x=>x.shipName)).size;
+ $("#myRemain").textContent=5-mySunk;$("#enemyRemain").textContent=5-enemySunk;
+ const shots=Object.keys(state.myShots).length,hits=Object.values(state.myShots).filter(x=>x.hit).length;
+ $("#accuracy").textContent=shots?Math.round(hits/shots*100)+"%":"0%";$("#turnCount").textContent=state.turnCount
+}
+function renderShots(){
+ Object.entries(state.enemyShots).forEach(([k,v])=>{const [r,c]=k.split("-").map(Number),e=cell("#myBoard",r,c);e.classList.add(v.hit?"hit":"miss");if(v.sunk)e.classList.add("sunk")});
+ Object.entries(state.myShots).forEach(([k,v])=>{const [r,c]=k.split("-").map(Number),e=cell("#enemyBoard",r,c);e.classList.add(v.hit?"hit":"miss");if(v.sunk)e.classList.add("sunk")});
+ document.querySelectorAll("#enemyBoard .cell").forEach(e=>{const k=key(+e.dataset.r,+e.dataset.c);e.disabled=state.over||!state.myTurn||!!state.myShots[k];e.classList.toggle("targetable",!e.disabled)})
+}
+function status(){
+ if(state.over)return;
+ $("#turnText").textContent=state.myTurn?"🎯 Lượt của bạn":"⏳ Lượt "+state.enemy;
+ $("#gameMsg").textContent=state.myTurn?"Chạm vào một ô trên vùng biển đối thủ để phóng tên lửa.":"Đối thủ đang ngắm bắn…";renderShots()
+}
+function centerOf(el){const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}}
+function missileFx(target,hit){
+ const fx=$("#fx"),t=centerOf(target),m=document.createElement("div");m.className="missile";m.style.left=(t.x-180)+"px";m.style.top=(t.y-220)+"px";fx.appendChild(m);audio("launch");
+ m.animate([{transform:"translate(0,0) rotate(45deg)",opacity:1},{transform:"translate(180px,220px) rotate(45deg)",opacity:1}],{duration:430,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
+  m.remove();const b=document.createElement("div");b.className=hit?"explosion":"splash";b.style.left=t.x+"px";b.style.top=t.y+"px";fx.appendChild(b);audio(hit?"hit":"miss");
+  if(hit){$("#app").classList.add("shake");setTimeout(()=>$("#app").classList.remove("shake"),320);if(navigator.vibrate)try{navigator.vibrate([60,40,90])}catch(e){}}
+  setTimeout(()=>b.remove(),700)
+ }
+}
+function fire(r,c){
+ const k=key(r,c);if(!state.started||state.over||!state.myTurn||state.myShots[k]||!state.conn?.open)return;
+ state.myTurn=false;status();state.conn.send({type:"shot",r,c})
+}
+function incoming(r,c){
+ if(state.over)return;const k=key(r,c);if(state.enemyShots[k])return;
+ let hit=false,sunk=false,shipName=null;
+ const ship=state.placements.find(p=>p.cells.some(([rr,cc])=>rr===r&&cc===c));
+ if(ship){hit=true;shipName=ship.name;if(!ship.hits.some(([rr,cc])=>rr===r&&cc===c))ship.hits.push([r,c]);sunk=ship.hits.length===ship.size}
+ state.enemyShots[k]={hit,sunk,shipName};renderShots();missileFx(cell("#myBoard",r,c),hit);
+ const win=state.placements.filter(p=>p.hits.length===p.size).length===5;state.conn.send({type:"shotResult",r,c,hit,sunk,shipName,win});stats();
+ if(win){setTimeout(()=>end(false),520);return}
+ state.myTurn=true;setTimeout(status,520)
+}
+function result(d){
+ const k=key(d.r,d.c);state.myShots[k]={hit:d.hit,sunk:d.sunk,shipName:d.shipName};state.turnCount++;renderShots();missileFx(cell("#enemyBoard",d.r,d.c),d.hit);stats();
+ if(d.hit)toast(d.sunk?"Đánh chìm "+d.shipName+"!":"Bắn trúng!");else toast("Bắn trượt.");
+ if(d.win){setTimeout(()=>end(true),520);return}
+ state.myTurn=false;setTimeout(status,520)
+}
+function end(win){
+ state.over=true;renderShots();show($("#resultModal"),true);
+ $("#resultIcon").textContent=win?"🏆":"💥";$("#resultTitle").textContent=win?"CHIẾN THẮNG":"THẤT BẠI";
+ $("#resultSub").textContent=win?"Bạn đã đánh chìm toàn bộ hạm đội của "+state.enemy+".":"Hạm đội của bạn đã bị "+state.enemy+" đánh chìm.";
+ audio(win?"win":"lose")
+}
+function reset(send=true){
+ state.orientation="h";state.placements=[];state.ready=false;state.enemyReady=false;state.started=false;state.myTurn=false;state.myShots={};state.enemyShots={};state.over=false;state.turnCount=0;
+ show($("#resultModal"),false);show($("#game"),false);show($("#setup"),true);renderSetup();if(send)state.conn?.send({type:"rematch"});toast("Bắt đầu trận mới.")
+}
+function onData(d){
+ if(!d||!d.type)return;
+ if(d.type==="intro"){state.enemy=d.name||"Đối thủ";$("#enemyName").textContent=state.enemy;$("#lobbyMsg").textContent=state.enemy+" đã vào phòng."}
+ if(d.type==="ready"){state.enemyReady=true;$("#setupMsg").textContent=state.ready?"Cả hai đã sẵn sàng.":"Đối thủ đã sẵn sàng.";maybeStart()}
+ if(d.type==="shot")incoming(+d.r,+d.c);
+ if(d.type==="shotResult")result(d);
+ if(d.type==="rematch"){reset(false);toast(state.enemy+" muốn chơi lại.")}
+}
+$("#createBtn").addEventListener("click",host);
+$("#joinBtn").addEventListener("click",join);
+$("#playerName").addEventListener("input",nameNow);
+$("#roomInput").addEventListener("input",e=>e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,""));
+$("#rotateBtn").addEventListener("click",()=>{state.orientation=state.orientation==="h"?"v":"h";renderSetup()});
+$("#randomBtn").addEventListener("click",randomize);
+$("#clearBtn").addEventListener("click",()=>{if(!state.ready){state.placements=[];renderSetup()}});
+$("#readyBtn").addEventListener("click",ready);
+$("#rematchBtn").addEventListener("click",()=>reset(true));
+$("#closeResultBtn").addEventListener("click",()=>show($("#resultModal"),false));
+$("#soundBtn").addEventListener("click",()=>{state.sound=!state.sound;$("#soundBtn").textContent=state.sound?"🔊 Âm thanh":"🔇 Tắt âm";toast(state.sound?"Đã bật âm thanh.":"Đã tắt âm thanh.")});
+$("#copyBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("#shareLink").value);toast("Đã copy link mời.")}catch(e){$("#shareLink").select();document.execCommand("copy");toast("Đã copy link mời.")}});
+boardBuild("#setupBoard","setup");renderSetup();$("#setupBoard").addEventListener("mouseleave",clearPreview);nameNow();
+const p=new URLSearchParams(location.search),r=p.get("room");if(r){$("#roomInput").value=r.toUpperCase();state.room=r.toUpperCase();roomUI();$("#lobbyMsg").textContent="Bạn được mời vào phòng "+r.toUpperCase()+". Nhập tên rồi bấm Vào phòng."}
+})();
+</script>
+</body>
+</html>
